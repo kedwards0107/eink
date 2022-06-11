@@ -131,7 +131,7 @@ try:
             spanDays = round((span.total_seconds()/60/60/24), 1)
             elapsedDays = round((elapsed.total_seconds()/60/60/24), 1)
             print(spanDays, elapsedDays)
-            if spanDays >= 1.1:
+            if spanDays >= 1.0:
                 spanDate = datetime.datetime.now()
                 calc_span = spanDate - prevDate
                 print("span days triggered")
