@@ -44,11 +44,14 @@ creds = ServiceAccountCredentials.from_json_keyfile_name("creds2.json", scope)
 client = gspread.authorize(creds)
 sheet = client.open("Plants").sheet1  # Open the spreadsheet
 data = sheet.get_all_records()
+last_pressed = sheet.acell('B2').value
+print(last_pressed)
 
 # starting text for display and function
-prevDate = datetime.datetime(2022,6,4,16,22,0,0)
-spanDate = datetime.datetime(2022,6,4,16,22,0,0)
+prevDate = datetime.datetime.strptime(last_pressed,"%Y-%m-%d %H:%M:%S")
+spanDate = datetime.datetime.strptime(last_pressed,"%Y-%m-%d %H:%M:%S")
 text = "Plants watered on:"
+#text2 = last_pressed
 text2 = prevDate.strftime("%m/%d/%Y, %H:%M")
 wifi_text = "Wifi up"
 wifi_string = "sudo ifconfig wlan0 up"
@@ -128,8 +131,8 @@ try:
             now = datetime.datetime.now()
             span = now - spanDate
             elapsed = now - prevDate
-            spanDays = round((span.total_seconds()/60/60/24), 1)
-            elapsedDays = round((elapsed.total_seconds()/60/60/24), 1)
+            spanDays = round((span.total_seconds()/60/60/24), 10)
+            elapsedDays = round((elapsed.total_seconds()/60/60/24), 10)
             print(spanDays, elapsedDays)
             if spanDays >= 1.0:
                 spanDate = datetime.datetime.now()
@@ -138,37 +141,40 @@ try:
                 daysAgo = round((calc_span.total_seconds()/60/60/24), 1)
                 span_daysAgo = " %s days ago" %(daysAgo)
                 text3 = span_daysAgo
+                #trigDate =  datetime.datetime.now()
+                #text3 = trigDate.strftime("%m/%d/%Y, %H:%M")
                 render()
             elif wifi_state == False:
                 wifi_string = next(wifi)
                 wifi_text = ("Wifi " + wifi_string[19:])
                 print(wifi_text)
-                os.system(wifi_string)
+                #os.system(wifi_string)
                 render()
             elif input_state == False:
                 time.sleep(0.5)
-                print(wifi_string)
-                if wifi_string == "sudo ifconfig wlan0 down":
-                    wifi_string_up = "sudo ifconfig wlan0 up"
-                    os.system(wifi_string_up)
-                    print("Wifi up")
-                    time.sleep(15)
+                #print(wifi_string)
+                #if wifi_string == "sudo ifconfig wlan0 down":
+                    #wifi_string_up = "sudo ifconfig wlan0 up"
+                    #os.system(wifi_string_up)
+                    #print("Wifi up")
+                    #time.sleep(15)
                 now = datetime.datetime.now()
                 calc_span = now - prevDate
                 print(prevDate)
                 daysAgo = round((calc_span.total_seconds()/60/60/24), 1)
                 prevDate =  datetime.datetime.now()
+                text2 = prevDate
                 text2 = prevDate.strftime("%m/%d/%Y, %H:%M")
                 text3 = "0 Days Ago"
                 wifi_text = "Wifi down"
                 render()
                 now_format = prevDate.strftime("%Y-%m-%d %H:%M:%S")
                 insertRow = ["watered on", now_format, daysAgo]
+                #insertRow = ["watered on", prevDate, daysAgo]
                 sheet.insert_row(insertRow, 2)
-                wifi_string_down = "sudo ifconfig wlan0 down"
-                os.system(wifi_string_down)
+                #wifi_string_down = "sudo ifconfig wlan0 down"
+                #os.system(wifi_string_down)
                 time.sleep(5)
     
 except KeyboardInterrupt:
 	print ("Done")
-	
